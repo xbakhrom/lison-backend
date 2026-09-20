@@ -11,6 +11,7 @@ import (
 func (s *Server) listDueCards(w http.ResponseWriter, r *http.Request) {
 	user := currentUser(r.Context())
 	today := localToday(r)
+	topicID := r.URL.Query().Get("topicId")
 	rows, err := s.db.Query(r.Context(), `
 		SELECT c.id, v.id, v.russian, v.uzbek, t.title, c.state,
 		       c.interval_days, c.ease_factor::float8, c.due_date::text,
@@ -19,7 +20,8 @@ func (s *Server) listDueCards(w http.ResponseWriter, r *http.Request) {
 		JOIN vocabulary_items v ON v.id = c.vocabulary_item_id
 		JOIN topics t ON t.id = v.topic_id
 		WHERE c.user_id = $1 AND c.due_date <= $2
-		ORDER BY CASE WHEN c.state = 'new' THEN 2 ELSE 1 END, c.due_date, c.id`, user.ID, today)
+		  AND ($3 = '' OR v.topic_id = $3)
+		ORDER BY CASE WHEN c.state = 'new' THEN 2 ELSE 1 END, c.due_date, c.id`, user.ID, today, topicID)
 	if err != nil {
 		s.logger.Error("list due cards", "error", err)
 		writeError(w, http.StatusInternalServerError, "database_error", "Не удалось загрузить повторение.")
