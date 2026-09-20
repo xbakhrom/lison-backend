@@ -86,8 +86,8 @@ jobs:
       group: lison-backend-production
       cancel-in-progress: false
     env:
-      SSH_HOST: ${{ secrets.SSH_HOST }}
-      SSH_USER: ${{ secrets.SSH_USER }}
+      SSH_HOST: ${{ vars.SSH_HOST }}
+      SSH_USER: ${{ vars.SSH_USER }}
       SSH_PORT: ${{ vars.SSH_PORT || '22' }}
       DEPLOY_PATH: ${{ vars.DEPLOY_PATH || '/opt/lison' }}
       IMAGE: ghcr.io/${{ github.repository }}:${{ github.sha }}
@@ -102,6 +102,10 @@ jobs:
           SSH_KNOWN_HOSTS: ${{ secrets.SSH_KNOWN_HOSTS }}
         run: |
           set -euo pipefail
+          : "${SSH_HOST:?production variable SSH_HOST is required}"
+          : "${SSH_USER:?production variable SSH_USER is required}"
+          : "${SSH_PRIVATE_KEY:?production secret SSH_PRIVATE_KEY is required}"
+          : "${SSH_KNOWN_HOSTS:?production secret SSH_KNOWN_HOSTS is required}"
           install -d -m 700 ~/.ssh
           printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
