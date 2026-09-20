@@ -9,10 +9,9 @@ import (
 type Rating string
 
 const (
-	Again Rating = "again"
-	Hard  Rating = "hard"
-	Good  Rating = "good"
-	Easy  Rating = "easy"
+	Hard Rating = "hard"
+	Good Rating = "good"
+	Easy Rating = "easy"
 )
 
 type Card struct {
@@ -36,57 +35,50 @@ func Schedule(card Card, rating Rating, today time.Time) (Result, error) {
 	if card.EaseFactor == 0 {
 		card.EaseFactor = 2.5
 	}
+	quality, err := sm2Quality(rating)
+	if err != nil {
+		return Result{}, err
+	}
+
+	qualityGap := float64(5 - quality)
+	nextEase := math.Max(1.3, card.EaseFactor+0.1-qualityGap*(0.08+qualityGap*0.02))
+	successfulRepetitions := card.Repetitions
+	if card.State == "new" || card.State == "relearning" || card.IntervalDays <= 0 {
+		successfulRepetitions = 0
+	}
+
+	intervalDays := 1
+	switch successfulRepetitions {
+	case 0:
+		intervalDays = 1
+	case 1:
+		intervalDays = 6
+	default:
+		intervalDays = max(1, int(math.Ceil(float64(card.IntervalDays)*card.EaseFactor)))
+	}
+
 	result := Result{
-		State:        card.State,
-		IntervalDays: card.IntervalDays,
-		EaseFactor:   card.EaseFactor,
-		Repetitions:  card.Repetitions + 1,
+		State:        "review",
+		IntervalDays: intervalDays,
+		EaseFactor:   nextEase,
+		Repetitions:  successfulRepetitions + 1,
 		Lapses:       card.Lapses,
 	}
-
-	switch rating {
-	case Again:
-		if card.State == "review" {
-			result.Lapses++
-		}
-		result.State = "relearning"
-		result.IntervalDays = 0
-		result.EaseFactor = math.Max(1.3, card.EaseFactor-0.2)
-	case Hard:
-		result.State = "review"
-		if card.State == "new" || card.State == "relearning" || card.IntervalDays == 0 {
-			result.IntervalDays = 1
-		} else {
-			result.IntervalDays = max(1, int(math.Ceil(float64(card.IntervalDays)*1.2)))
-		}
-		result.EaseFactor = math.Max(1.3, card.EaseFactor-0.15)
-	case Good:
-		result.State = "review"
-		switch card.State {
-		case "new":
-			result.IntervalDays = 3
-		case "relearning":
-			result.IntervalDays = 1
-		default:
-			result.IntervalDays = max(1, int(math.Ceil(float64(card.IntervalDays)*card.EaseFactor)))
-		}
-	case Easy:
-		result.State = "review"
-		switch card.State {
-		case "new":
-			result.IntervalDays = 7
-		case "relearning":
-			result.IntervalDays = 3
-		default:
-			result.IntervalDays = max(1, int(math.Ceil(float64(card.IntervalDays)*(card.EaseFactor+0.3))))
-		}
-		result.EaseFactor = math.Min(3.0, card.EaseFactor+0.15)
-	default:
-		return Result{}, fmt.Errorf("unknown rating %q", rating)
-	}
-
 	result.DueDate = day(today).AddDate(0, 0, result.IntervalDays)
 	return result, nil
+}
+
+func sm2Quality(rating Rating) (int, error) {
+	switch rating {
+	case Hard:
+		return 3, nil
+	case Good:
+		return 4, nil
+	case Easy:
+		return 5, nil
+	default:
+		return 0, fmt.Errorf("unknown rating %q", rating)
+	}
 }
 
 func day(t time.Time) time.Time {
