@@ -1,0 +1,51 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: lison-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-lison}
+      POSTGRES_USER: ${POSTGRES_USER:-lison}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
+    volumes:
+      - lison_postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks:
+      - lison
+
+  backend:
+    image: ${BACKEND_IMAGE:-ghcr.io/xbakhrom/lison-backend:main}
+    container_name: lison-backend
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgres://${POSTGRES_USER:-lison}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-lison}?sslmode=disable
+      MINI_APP_URL: https://lison.xbakhrom.uz
+      FRONTEND_ORIGIN: https://lison.xbakhrom.uz
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:8080:8080"
+    networks:
+      - lison
+
+  webapp:
+    image: ${WEBAPP_IMAGE:-ghcr.io/xbakhrom/lison-webapp:main}
+    container_name: lison-webapp
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3000:80"
+    networks:
+      - lison
+
+volumes:
+  lison_postgres:
+
+networks:
+  lison:
