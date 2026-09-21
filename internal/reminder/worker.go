@@ -39,15 +39,24 @@ func (w *Worker) Run(ctx context.Context) {
 
 func (w *Worker) process(ctx context.Context) {
 	rows, err := w.db.Query(ctx, `
-		SELECT r.user_id, count(c.id)::int,
+		SELECT r.user_id,
+		       (SELECT count(*)::int FROM user_cards c
+		        WHERE c.user_id = r.user_id
+		          AND c.due_date <= (now() AT TIME ZONE r.timezone)::date) AS card_count,
+		       (SELECT count(*)::int FROM user_grammar_progress g
+		        WHERE g.user_id = r.user_id
+		          AND g.status IN ('learning', 'review')
+		          AND g.due_date <= (now() AT TIME ZONE r.timezone)::date) AS grammar_count,
 		       (now() AT TIME ZONE r.timezone)::date AS local_date
 		FROM reminder_settings r
-		JOIN user_cards c ON c.user_id = r.user_id
 		WHERE r.enabled
-		  AND c.due_date <= (now() AT TIME ZONE r.timezone)::date
+		  AND ((SELECT count(*) FROM user_cards c WHERE c.user_id = r.user_id
+		        AND c.due_date <= (now() AT TIME ZONE r.timezone)::date) > 0
+		    OR (SELECT count(*) FROM user_grammar_progress g WHERE g.user_id = r.user_id
+		        AND g.status IN ('learning', 'review')
+		        AND g.due_date <= (now() AT TIME ZONE r.timezone)::date) > 0)
 		  AND r.reminder_time <= (now() AT TIME ZONE r.timezone)::time
 		  AND (r.last_sent_on IS NULL OR r.last_sent_on < (now() AT TIME ZONE r.timezone)::date)
-		GROUP BY r.user_id, r.timezone
 		ORDER BY r.user_id
 		LIMIT 100`)
 	if err != nil {
@@ -56,21 +65,22 @@ func (w *Worker) process(ctx context.Context) {
 	}
 	defer rows.Close()
 	type candidate struct {
-		userID    int64
-		count     int
-		localDate time.Time
+		userID       int64
+		cardCount    int
+		grammarCount int
+		localDate    time.Time
 	}
 	candidates := make([]candidate, 0)
 	for rows.Next() {
 		var item candidate
-		if err := rows.Scan(&item.userID, &item.count, &item.localDate); err != nil {
+		if err := rows.Scan(&item.userID, &item.cardCount, &item.grammarCount, &item.localDate); err != nil {
 			w.logger.Error("scan reminder", "error", err)
 			return
 		}
 		candidates = append(candidates, item)
 	}
 	for _, item := range candidates {
-		if err := w.telegram.SendReminder(ctx, item.userID, item.count); err != nil {
+		if err := w.telegram.SendReminder(ctx, item.userID, item.cardCount, item.grammarCount); err != nil {
 			w.logger.Error("send reminder", "user_id", item.userID, "error", err)
 			continue
 		}

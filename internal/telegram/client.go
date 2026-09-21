@@ -40,17 +40,43 @@ func (c *Client) SendStart(ctx context.Context, chatID int64) error {
 	})
 }
 
-func (c *Client) SendReminder(ctx context.Context, chatID int64, count int) error {
+func (c *Client) SendReminder(ctx context.Context, chatID int64, cardCount, grammarCount int) error {
+	text := "Пора повторить материал."
+	screen := "review"
+	switch {
+	case cardCount > 0 && grammarCount > 0:
+		text = fmt.Sprintf("Пора повторить: %d %s и %d %s по грамматике.", cardCount, russianCardNoun(cardCount), grammarCount, russianTopicNoun(grammarCount))
+	case grammarCount > 0:
+		text = fmt.Sprintf("Пора освежить грамматику. Вас ждут %d %s — всего несколько минут игры.", grammarCount, russianTopicNoun(grammarCount))
+		screen = "grammar"
+	default:
+		text = fmt.Sprintf("Пора повторить слова. Сегодня вас ждут %d %s.", cardCount, russianCardNoun(cardCount))
+	}
 	return c.sendMessage(ctx, map[string]any{
 		"chat_id": chatID,
-		"text":    fmt.Sprintf("Пора повторить слова. Сегодня вас ждут %d %s.", count, russianCardNoun(count)),
+		"text":    text,
 		"reply_markup": map[string]any{
 			"inline_keyboard": [][]any{{map[string]any{
 				"text":    "Начать повторение",
-				"web_app": map[string]string{"url": c.miniAppURL + "?screen=review"},
+				"web_app": map[string]string{"url": c.miniAppURL + "?screen=" + screen},
 			}}},
 		},
 	})
+}
+
+func russianTopicNoun(count int) string {
+	mod100 := count % 100
+	mod10 := mod100 % 10
+	if mod100 > 10 && mod100 < 20 {
+		return "тем"
+	}
+	if mod10 == 1 {
+		return "тема"
+	}
+	if mod10 >= 2 && mod10 <= 4 {
+		return "темы"
+	}
+	return "тем"
 }
 
 func russianCardNoun(count int) string {
