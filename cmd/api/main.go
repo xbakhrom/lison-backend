@@ -12,6 +12,7 @@ import (
 
 	"github.com/xbakhrom/lison-backend/internal/config"
 	"github.com/xbakhrom/lison-backend/internal/database"
+	"github.com/xbakhrom/lison-backend/internal/discussion"
 	"github.com/xbakhrom/lison-backend/internal/grammar"
 	"github.com/xbakhrom/lison-backend/internal/httpapi"
 	"github.com/xbakhrom/lison-backend/internal/reminder"
@@ -40,6 +41,12 @@ func main() {
 		os.Exit(1)
 	}
 	logger.Info("grammar content synced", "topics", published)
+	questions, err := discussion.Sync(ctx, db)
+	if err != nil {
+		logger.Error("sync discussion content", "error", err)
+		os.Exit(1)
+	}
+	logger.Info("discussion content synced", "questions", questions)
 
 	telegramClient := telegram.NewClient(cfg.TelegramBotToken, cfg.MiniAppURL)
 	api := httpapi.New(cfg, db, telegramClient, logger)

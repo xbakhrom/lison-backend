@@ -1,0 +1,85 @@
+{
+  "id": "discussion_gorod",
+  "topicId": "topic_gorod",
+  "title": "Город",
+  "position": 2,
+  "questions": [
+    {
+      "id": "gorod_rayon",
+      "question": "В каком районе вы живёте? Расскажите, что там есть.",
+      "uzbekHint": "Qaysi tumanda yashaysiz? U yerda nimalar borligini gapirib bering.",
+      "level": "A2",
+      "followUps": [
+        "Что находится рядом с вашим домом?",
+        "Вам нравится ваш район?",
+        "Что вы хотели бы там изменить?"
+      ]
+    },
+    {
+      "id": "gorod_transport",
+      "question": "Как вы добираетесь до работы или учёбы?",
+      "uzbekHint": "Ishga yoki o'qishga qanday borasiz?",
+      "level": "A2",
+      "followUps": [
+        "Сколько времени занимает дорога?",
+        "Вам больше нравится метро или автобус?",
+        "Что вы делаете в дороге?"
+      ]
+    },
+    {
+      "id": "gorod_centr",
+      "question": "Расскажите про центр вашего города. Что там интересного?",
+      "uzbekHint": "Shahringizning markazi haqida gapiring. U yerda nima qiziq?",
+      "level": "B1",
+      "followUps": [
+        "Как часто вы бываете в центре?",
+        "Куда вы ведёте гостей города?",
+        "Центр сильно изменился за последние годы?"
+      ]
+    },
+    {
+      "id": "gorod_pokupki",
+      "question": "Где вы обычно покупаете продукты — на рынке или в магазине?",
+      "uzbekHint": "Oziq-ovqatni odatda qayerdan olasiz — bozordanmi yoki do'kondanmi?",
+      "level": "A2",
+      "followUps": [
+        "Почему вам удобнее именно там?",
+        "Что вы покупаете чаще всего?",
+        "Вы любите торговаться на рынке?"
+      ]
+    },
+    {
+      "id": "gorod_sosedi",
+      "question": "Вы знаете своих соседей? Расскажите про них.",
+      "uzbekHint": "Qo'shnilaringizni bilasizmi? Ular haqida gapirib bering.",
+      "level": "A2",
+      "followUps": [
+        "Вы помогаете друг другу?",
+        "Как вы познакомились?",
+        "Что для вас значит хороший сосед?"
+      ]
+    },
+    {
+      "id": "gorod_mechta",
+      "question": "В каком городе вы хотели бы жить и почему?",
+      "uzbekHint": "Qaysi shaharda yashashni xohlardingiz va nega?",
+      "level": "B1",
+      "followUps": [
+        "Что там есть, чего нет здесь?",
+        "Вы бы переехали туда навсегда?",
+        "Чего вам не хватает в вашем городе?"
+      ]
+    },
+    {
+      "id": "gorod_probki",
+      "question": "Есть ли в вашем городе проблемы с транспортом или пробками?",
+      "uzbekHint": "Shahringizda transport yoki tirbandlik muammosi bormi?",
+      "level": "B1",
+      "followUps": [
+        "Когда бывает хуже всего?",
+        "Как, по-вашему, это можно решить?",
+        "Вы думали пересесть на велосипед?"
+      ]
+    }
+  ]
+}

@@ -24,7 +24,7 @@ func (w *Worker) Run(ctx context.Context) {
 		w.logger.Info("reminder worker disabled: Telegram credentials are not configured")
 		return
 	}
-	w.process(ctx)
+	w.tick(ctx)
 	ticker := time.NewTicker(time.Minute)
 	defer ticker.Stop()
 	for {
@@ -32,7 +32,74 @@ func (w *Worker) Run(ctx context.Context) {
 		case <-ctx.Done():
 			return
 		case <-ticker.C:
-			w.process(ctx)
+			w.tick(ctx)
+		}
+	}
+}
+
+func (w *Worker) tick(ctx context.Context) {
+	w.process(ctx)
+	w.processDiscussions(ctx)
+}
+
+// processDiscussions sends the question of the day to learners who have nothing
+// left to review, so the daily nudge still has something to offer them. Learners
+// with due cards get the review reminder instead; one push a day is enough.
+func (w *Worker) processDiscussions(ctx context.Context) {
+	rows, err := w.db.Query(ctx, `
+		SELECT r.user_id, q.id, q.question, q.uzbek_hint,
+		       (now() AT TIME ZONE r.timezone)::date AS local_date
+		FROM reminder_settings r
+		CROSS JOIN LATERAL (
+			SELECT d.id, d.question, d.uzbek_hint
+			FROM discussion_questions d
+			LEFT JOIN user_discussion_log l ON l.question_id = d.id AND l.user_id = r.user_id
+			WHERE d.active AND l.question_id IS NULL
+			ORDER BY d.position, d.id
+			LIMIT 1
+		) q
+		WHERE r.enabled
+		  AND r.reminder_time <= (now() AT TIME ZONE r.timezone)::time
+		  AND (r.last_discussion_on IS NULL OR r.last_discussion_on < (now() AT TIME ZONE r.timezone)::date)
+		  AND NOT EXISTS (
+		      SELECT 1 FROM user_cards c WHERE c.user_id = r.user_id
+		      AND c.due_date <= (now() AT TIME ZONE r.timezone)::date)
+		  AND NOT EXISTS (
+		      SELECT 1 FROM user_grammar_progress g WHERE g.user_id = r.user_id
+		      AND g.status IN ('learning', 'review')
+		      AND g.due_date <= (now() AT TIME ZONE r.timezone)::date)
+		ORDER BY r.user_id
+		LIMIT 100`)
+	if err != nil {
+		w.logger.Error("find discussion nudges", "error", err)
+		return
+	}
+	defer rows.Close()
+	type candidate struct {
+		userID     int64
+		questionID string
+		question   string
+		uzbekHint  string
+		localDate  time.Time
+	}
+	candidates := make([]candidate, 0)
+	for rows.Next() {
+		var item candidate
+		if err := rows.Scan(&item.userID, &item.questionID, &item.question, &item.uzbekHint, &item.localDate); err != nil {
+			w.logger.Error("scan discussion nudge", "error", err)
+			return
+		}
+		candidates = append(candidates, item)
+	}
+	for _, item := range candidates {
+		if err := w.telegram.SendDiscussion(ctx, item.userID, item.question, item.uzbekHint); err != nil {
+			w.logger.Error("send discussion nudge", "user_id", item.userID, "error", err)
+			continue
+		}
+		if _, err := w.db.Exec(ctx, `
+			UPDATE reminder_settings SET last_discussion_on = $2, updated_at = now()
+			WHERE user_id = $1`, item.userID, item.localDate); err != nil {
+			w.logger.Error("mark discussion nudge sent", "user_id", item.userID, "error", err)
 		}
 	}
 }

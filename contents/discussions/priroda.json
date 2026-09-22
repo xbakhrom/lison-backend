@@ -1,0 +1,74 @@
+{
+  "id": "discussion_priroda",
+  "topicId": "topic_priroda",
+  "title": "Природа",
+  "position": 4,
+  "questions": [
+    {
+      "id": "priroda_vremya_goda",
+      "question": "Какое время года вы любите больше всего и почему?",
+      "uzbekHint": "Qaysi faslni ko'proq yoqtirasiz va nega?",
+      "level": "A1",
+      "followUps": [
+        "Что вы делаете в это время года?",
+        "А какое время года вам не нравится?",
+        "Какая погода была вчера?"
+      ]
+    },
+    {
+      "id": "priroda_otdyh",
+      "question": "Расскажите, как вы отдыхаете на природе.",
+      "uzbekHint": "Tabiatda qanday dam olishingizni gapirib bering.",
+      "level": "A2",
+      "followUps": [
+        "С кем вы обычно ездите?",
+        "Что вы берёте с собой?",
+        "Когда вы были на природе в последний раз?"
+      ]
+    },
+    {
+      "id": "priroda_gory",
+      "question": "Вы были в горах или у моря? Что вам понравилось больше?",
+      "uzbekHint": "Tog'da yoki dengizda bo'lganmisiz? Qaysi biri ko'proq yoqdi?",
+      "level": "B1",
+      "followUps": [
+        "Что вы там чувствовали?",
+        "Куда вы хотели бы поехать снова?",
+        "Вы любите долгие прогулки?"
+      ]
+    },
+    {
+      "id": "priroda_zhivotnye",
+      "question": "У вас есть домашние животные? Расскажите про них.",
+      "uzbekHint": "Uy hayvonlaringiz bormi? Ular haqida gapirib bering.",
+      "level": "A2",
+      "followUps": [
+        "Кто за ними ухаживает?",
+        "Какое животное вы хотели бы завести?",
+        "Вы боитесь каких-нибудь животных?"
+      ]
+    },
+    {
+      "id": "priroda_ekologiya",
+      "question": "Что человек может сделать, чтобы беречь природу?",
+      "uzbekHint": "Tabiatni asrash uchun inson nima qila oladi?",
+      "level": "B1",
+      "followUps": [
+        "Вы сами что-то делаете для этого?",
+        "Это должна решать власть или каждый человек?",
+        "Что изменилось в природе за вашу жизнь?"
+      ]
+    },
+    {
+      "id": "priroda_pogoda",
+      "question": "Как погода влияет на ваше настроение?",
+      "uzbekHint": "Ob-havo kayfiyatingizga qanday ta'sir qiladi?",
+      "level": "A2",
+      "followUps": [
+        "В какую погоду вам работается лучше всего?",
+        "Что вы делаете, когда идёт дождь?",
+        "Вы смотрите прогноз погоды?"
+      ]
+    }
+  ]
+}

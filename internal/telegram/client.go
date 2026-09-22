@@ -74,6 +74,25 @@ func (c *Client) SendReminder(ctx context.Context, chatID int64, cardCount, gram
 	})
 }
 
+// SendDiscussion nudges the learner with today's conversation question and opens
+// straight into a voice session with Maks.
+func (c *Client) SendDiscussion(ctx context.Context, chatID int64, question, uzbekHint string) error {
+	text := fmt.Sprintf("🗣 Вопрос дня\n\n%s", question)
+	if uzbekHint != "" {
+		text += "\n\n" + uzbekHint
+	}
+	return c.sendMessage(ctx, map[string]any{
+		"chat_id": chatID,
+		"text":    text,
+		"reply_markup": map[string]any{
+			"inline_keyboard": [][]any{{map[string]any{
+				"text":    "Обсудить с Максом",
+				"web_app": map[string]string{"url": c.miniAppURL + "?screen=assistant"},
+			}}},
+		},
+	})
+}
+
 func russianTopicNoun(count int) string {
 	mod100 := count % 100
 	mod10 := mod100 % 10

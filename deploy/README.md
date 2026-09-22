@@ -38,6 +38,16 @@ Optional variables:
 
 After this, pushes to `main` deploy each container independently. The deployment performs a local health-check and restores the previous image if it fails.
 
+## Changing environment variables
+
+Deployments only pull a new image; they never touch `/opt/lison/.env`. After
+editing it, recreate the container yourself so the new values are read:
+
+```bash
+cd /opt/lison
+docker compose -f compose.production.yaml up -d --force-recreate backend
+```
+
 ## Nginx and HTTPS
 
 The checked-in Nginx configuration serves `lison.xbakhrom.uz`, sends `/api/`

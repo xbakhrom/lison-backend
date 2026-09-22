@@ -1,0 +1,96 @@
+{
+  "id": "discussion_general",
+  "topicId": "",
+  "title": "Обычный разговор",
+  "position": 1,
+  "questions": [
+    {
+      "id": "general_day",
+      "question": "Как прошёл ваш день? Расскажите, что вы делали сегодня.",
+      "uzbekHint": "Bugungi kuningiz qanday o'tdi? Nima qilganingizni gapirib bering.",
+      "level": "A1",
+      "followUps": [
+        "А что было самым интересным?",
+        "Вы устали сегодня?",
+        "Завтра будет такой же день?"
+      ]
+    },
+    {
+      "id": "general_morning",
+      "question": "Расскажите про своё утро. Во сколько вы встаёте и что делаете сначала?",
+      "uzbekHint": "Ertalabingiz haqida gapiring: soat nechada turasiz va avval nima qilasiz?",
+      "level": "A1",
+      "followUps": [
+        "Вы завтракаете дома или нет?",
+        "Вам легко вставать рано?",
+        "Что вы делаете, когда опаздываете?"
+      ]
+    },
+    {
+      "id": "general_work",
+      "question": "Чем вы занимаетесь — работаете или учитесь? Расскажите немного.",
+      "uzbekHint": "Nima bilan shug'ullanasiz — ishlaysizmi yoki o'qiysizmi? Biroz gapirib bering.",
+      "level": "A2",
+      "followUps": [
+        "Что вам нравится в этом больше всего?",
+        "А что бывает трудно?",
+        "Кем вы хотели стать в детстве?"
+      ]
+    },
+    {
+      "id": "general_weekend",
+      "question": "Что вы обычно делаете в выходные?",
+      "uzbekHint": "Dam olish kunlari odatda nima qilasiz?",
+      "level": "A1",
+      "followUps": [
+        "Вы отдыхаете дома или выходите куда-то?",
+        "С кем вы обычно проводите выходные?",
+        "А что вы хотели бы делать в выходные?"
+      ]
+    },
+    {
+      "id": "general_food",
+      "question": "Какое ваше любимое блюдо? Расскажите, как его готовят.",
+      "uzbekHint": "Eng yoqtirgan taomingiz qaysi? Uni qanday tayyorlashini gapirib bering.",
+      "level": "A2",
+      "followUps": [
+        "Вы сами умеете это готовить?",
+        "Когда вы ели это в последний раз?",
+        "Есть еда, которую вы совсем не любите?"
+      ]
+    },
+    {
+      "id": "general_russian",
+      "question": "Зачем вам русский язык? Где вы его используете?",
+      "uzbekHint": "Rus tili sizga nima uchun kerak? Uni qayerda ishlatasiz?",
+      "level": "A2",
+      "followUps": [
+        "Что для вас самое трудное в русском языке?",
+        "Где вы слышите русскую речь чаще всего?",
+        "Каким вы хотите видеть свой русский через год?"
+      ]
+    },
+    {
+      "id": "general_travel",
+      "question": "Расскажите про место, куда вы ездили. Что вам запомнилось?",
+      "uzbekHint": "Borgan joyingiz haqida gapiring. Nima esingizda qoldi?",
+      "level": "B1",
+      "followUps": [
+        "С кем вы туда ездили?",
+        "Вы хотели бы вернуться туда?",
+        "Куда вы поедете в следующий раз?"
+      ]
+    },
+    {
+      "id": "general_plans",
+      "question": "Какие у вас планы на этот месяц?",
+      "uzbekHint": "Shu oyga qanday rejalaringiz bor?",
+      "level": "A2",
+      "followUps": [
+        "Что из этого самое важное?",
+        "Что может помешать вашим планам?",
+        "Кто вам помогает в этих делах?"
+      ]
+    }
+  ]
+}

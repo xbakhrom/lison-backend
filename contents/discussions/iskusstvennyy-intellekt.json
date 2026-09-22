@@ -1,0 +1,74 @@
+{
+  "id": "discussion_ai",
+  "topicId": "topic_ai",
+  "title": "Искусственный интеллект",
+  "position": 5,
+  "questions": [
+    {
+      "id": "ai_kak_polzuetes",
+      "question": "Вы пользуетесь искусственным интеллектом? Расскажите, как именно.",
+      "uzbekHint": "Sun'iy intellektdan foydalanasizmi? Qanday foydalanishingizni gapiring.",
+      "level": "A2",
+      "followUps": [
+        "Что он помогает вам делать быстрее?",
+        "Когда вы попробовали это в первый раз?",
+        "Вы доверяете его ответам?"
+      ]
+    },
+    {
+      "id": "ai_rabota",
+      "question": "Как вы думаете, машины заменят людей на работе?",
+      "uzbekHint": "Sizningcha, mashinalar ishda odamlarning o'rnini bosadimi?",
+      "level": "B1",
+      "followUps": [
+        "Какие профессии останутся у людей?",
+        "Вы боитесь этого или нет?",
+        "Чему нужно учиться сегодня?"
+      ]
+    },
+    {
+      "id": "ai_ucheba",
+      "question": "Может ли искусственный интеллект научить языку лучше, чем учитель?",
+      "uzbekHint": "Sun'iy intellekt tilni o'qituvchidan yaxshiroq o'rgata oladimi?",
+      "level": "B1",
+      "followUps": [
+        "Чего ему не хватает?",
+        "Что вам даёт живой человек?",
+        "Как вы учите язык сейчас?"
+      ]
+    },
+    {
+      "id": "ai_oshibki",
+      "question": "Что делать, если программа ошибается? Кто за это отвечает?",
+      "uzbekHint": "Dastur xato qilsa nima qilish kerak? Buning uchun kim javob beradi?",
+      "level": "B1",
+      "followUps": [
+        "Вы замечали такие ошибки?",
+        "Как вы проверяете информацию?",
+        "Нужны ли здесь строгие правила?"
+      ]
+    },
+    {
+      "id": "ai_budushchee",
+      "question": "Каким вы видите мир через двадцать лет?",
+      "uzbekHint": "Yigirma yildan keyingi dunyoni qanday tasavvur qilasiz?",
+      "level": "B1",
+      "followUps": [
+        "Что изменится в обычной жизни?",
+        "Что вас радует в этом будущем?",
+        "А что вас беспокоит?"
+      ]
+    },
+    {
+      "id": "ai_dannye",
+      "question": "Вас беспокоит, что программы собирают данные о людях?",
+      "uzbekHint": "Dasturlar odamlar haqida ma'lumot to'plashi sizni tashvishga soladimi?",
+      "level": "B1",
+      "followUps": [
+        "Вы читаете, на что соглашаетесь?",
+        "Что вы никогда не написали бы в интернете?",
+        "Стоит ли удобство такой цены?"
+      ]
+    }
+  ]
+}

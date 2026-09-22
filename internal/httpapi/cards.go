@@ -22,6 +22,25 @@ type cardResponse struct {
 	Lapses       int     `json:"lapses"`
 }
 
+// customCardsTitle groups words the learner added themselves, which have no
+// authored topic behind them.
+const customCardsTitle = "Мои слова"
+
+// cardSelect reads a card from either source: the authored catalogue or the
+// learner's own words. Callers append their own WHERE/ORDER BY.
+const cardSelect = `
+	SELECT c.id,
+	       COALESCE(v.id, 'custom:' || uv.id::text),
+	       COALESCE(v.russian, uv.russian),
+	       COALESCE(v.uzbek, uv.uzbek),
+	       COALESCE(t.title, '` + customCardsTitle + `'),
+	       c.state, c.interval_days, c.ease_factor::float8, c.due_date::text,
+	       c.repetitions, c.lapses
+	FROM user_cards c
+	LEFT JOIN vocabulary_items v ON v.id = c.vocabulary_item_id
+	LEFT JOIN topics t ON t.id = v.topic_id
+	LEFT JOIN user_vocabulary_items uv ON uv.id = c.user_vocabulary_item_id`
+
 func (s *Server) addCards(w http.ResponseWriter, r *http.Request) {
 	user := currentUser(r.Context())
 	var request struct {
@@ -53,13 +72,7 @@ func (s *Server) addCards(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) listCards(w http.ResponseWriter, r *http.Request) {
 	user := currentUser(r.Context())
-	rows, err := s.db.Query(r.Context(), `
-		SELECT c.id, v.id, v.russian, v.uzbek, t.title, c.state,
-		       c.interval_days, c.ease_factor::float8, c.due_date::text,
-		       c.repetitions, c.lapses
-		FROM user_cards c
-		JOIN vocabulary_items v ON v.id = c.vocabulary_item_id
-		JOIN topics t ON t.id = v.topic_id
+	rows, err := s.db.Query(r.Context(), cardSelect+`
 		WHERE c.user_id = $1
 		ORDER BY c.due_date, c.created_at`, user.ID)
 	if err != nil {
@@ -99,15 +112,26 @@ func (s *Server) deleteCard(w http.ResponseWriter, r *http.Request) {
 		writeError(w, http.StatusBadRequest, "invalid_card", "Некорректная карточка.")
 		return
 	}
-	result, err := s.db.Exec(r.Context(), "DELETE FROM user_cards WHERE id = $1 AND user_id = $2", cardID, user.ID)
+	// Deleting a card built on the learner's own word drops the word too: it has
+	// no home outside the card.
+	var customItemID *int64
+	err = s.db.QueryRow(r.Context(), `
+		DELETE FROM user_cards WHERE id = $1 AND user_id = $2
+		RETURNING user_vocabulary_item_id`, cardID, user.ID).Scan(&customItemID)
+	if isNoRows(err) {
+		writeError(w, http.StatusNotFound, "card_not_found", "Карточка не найдена.")
+		return
+	}
 	if err != nil {
 		s.logger.Error("delete card", "error", err)
 		writeError(w, http.StatusInternalServerError, "database_error", "Не удалось удалить карточку.")
 		return
 	}
-	if result.RowsAffected() == 0 {
-		writeError(w, http.StatusNotFound, "card_not_found", "Карточка не найдена.")
-		return
+	if customItemID != nil {
+		if _, err := s.db.Exec(r.Context(),
+			"DELETE FROM user_vocabulary_items WHERE id = $1 AND user_id = $2", *customItemID, user.ID); err != nil {
+			s.logger.Error("delete custom word", "error", err)
+		}
 	}
 	w.WriteHeader(http.StatusNoContent)
 }

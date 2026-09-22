@@ -9,6 +9,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/xbakhrom/lison-backend/internal/discussion"
 	"github.com/xbakhrom/lison-backend/internal/grammar"
 )
 
@@ -26,6 +27,7 @@ func main() {
 	files := 0
 	errorsFound := 0
 	errorsFound += lintGrammar()
+	errorsFound += lintDiscussions()
 	err := filepath.WalkDir(*root, func(path string, entry os.DirEntry, walkErr error) error {
 		if walkErr != nil {
 			return walkErr
@@ -82,6 +84,28 @@ func grammarQuestionCount(topics []grammar.Topic) int {
 		total += len(topic.Practice) + len(topic.Game)
 	}
 	return total
+}
+
+// lintDiscussions checks the embedded conversation questions the assistant pulls
+// from, on the same all-issues-at-once contract as the grammar bank.
+func lintDiscussions() int {
+	sets, err := discussion.LoadSets()
+	if err != nil {
+		fmt.Printf("ERROR contents/discussions: %v\n", err)
+		return 1
+	}
+	issues := discussion.Validate(sets)
+	for _, issue := range issues {
+		fmt.Printf("ERROR contents/discussions: %s\n", issue)
+	}
+	if len(issues) == 0 {
+		questions := 0
+		for _, set := range sets {
+			questions += len(set.Questions)
+		}
+		fmt.Printf("OK contents/discussions (%d sets, %d questions)\n", len(sets), questions)
+	}
+	return len(issues)
 }
 
 func validate(path string) ([]string, int) {

@@ -1,0 +1,74 @@
+{
+  "id": "discussion_druzhba",
+  "topicId": "topic_druzhba",
+  "title": "Дружба",
+  "position": 3,
+  "questions": [
+    {
+      "id": "druzhba_luchshiy",
+      "question": "Расскажите про своего лучшего друга. Какой он человек?",
+      "uzbekHint": "Eng yaqin do'stingiz haqida gapiring. U qanday odam?",
+      "level": "A2",
+      "followUps": [
+        "Как вы познакомились?",
+        "Что вы обычно делаете вместе?",
+        "Чем вы похожи и чем отличаетесь?"
+      ]
+    },
+    {
+      "id": "druzhba_kachestva",
+      "question": "Какие качества для вас самые важные в друге?",
+      "uzbekHint": "Do'stda siz uchun eng muhim fazilatlar qaysi?",
+      "level": "B1",
+      "followUps": [
+        "А чего вы точно не простите другу?",
+        "Вы сами такой друг?",
+        "Можно ли дружить с человеком, который совсем на вас не похож?"
+      ]
+    },
+    {
+      "id": "druzhba_pomosch",
+      "question": "Вспомните случай, когда друг вам помог. Что произошло?",
+      "uzbekHint": "Do'stingiz sizga yordam bergan holatni eslang. Nima bo'lgan edi?",
+      "level": "B1",
+      "followUps": [
+        "Как вы его отблагодарили?",
+        "А вы часто просите о помощи?",
+        "Вам легко принимать помощь?"
+      ]
+    },
+    {
+      "id": "druzhba_ssora",
+      "question": "Вы ссорились с друзьями? Как вы обычно миритесь?",
+      "uzbekHint": "Do'stlaringiz bilan janjallashganmisiz? Odatda qanday yarashasiz?",
+      "level": "B1",
+      "followUps": [
+        "Кто обычно делает первый шаг?",
+        "Бывает дружба, которая закончилась совсем?",
+        "Что помогает сохранить отношения?"
+      ]
+    },
+    {
+      "id": "druzhba_rasstoyanie",
+      "question": "Можно ли сохранить дружбу на расстоянии?",
+      "uzbekHint": "Uzoqda bo'lgan do'stlik saqlanib qoladimi?",
+      "level": "B1",
+      "followUps": [
+        "Как часто вы общаетесь с далёкими друзьями?",
+        "Телефон заменяет живую встречу?",
+        "Кого вы давно не видели, но всё ещё считаете другом?"
+      ]
+    },
+    {
+      "id": "druzhba_novye",
+      "question": "Легко ли вам знакомиться с новыми людьми?",
+      "uzbekHint": "Yangi odamlar bilan tanishish sizga osonmi?",
+      "level": "A2",
+      "followUps": [
+        "Где вы обычно знакомитесь?",
+        "О чём вы говорите в первый раз?",
+        "Что помогает вам чувствовать себя свободнее?"
+      ]
+    }
+  ]
+}

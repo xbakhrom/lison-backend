@@ -10,3 +10,12 @@ var Grammar embed.FS
 
 // GrammarDir is the directory inside Grammar that holds the topic files.
 const GrammarDir = "grammar"
+
+// Discussions holds one JSON file per conversation question set under
+// discussions/.
+//
+//go:embed discussions/*.json
+var Discussions embed.FS
+
+// DiscussionsDir is the directory inside Discussions that holds the set files.
+const DiscussionsDir = "discussions"

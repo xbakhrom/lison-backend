@@ -11,9 +11,11 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/xbakhrom/lison-backend/internal/auth"
 	"github.com/xbakhrom/lison-backend/internal/config"
+	"github.com/xbakhrom/lison-backend/internal/gemini"
 	"github.com/xbakhrom/lison-backend/internal/telegram"
 )
 
@@ -25,11 +27,18 @@ type Server struct {
 	cfg      config.Config
 	db       *pgxpool.Pool
 	telegram *telegram.Client
+	gemini   *gemini.Client
 	logger   *slog.Logger
 }
 
 func New(cfg config.Config, db *pgxpool.Pool, telegramClient *telegram.Client, logger *slog.Logger) *Server {
-	return &Server{cfg: cfg, db: db, telegram: telegramClient, logger: logger}
+	return &Server{
+		cfg:      cfg,
+		db:       db,
+		telegram: telegramClient,
+		gemini:   gemini.NewClient(cfg.GeminiAPIKey, cfg.GeminiLiveModel),
+		logger:   logger,
+	}
 }
 
 func (s *Server) Routes() http.Handler {
@@ -61,9 +70,20 @@ func (s *Server) Routes() http.Handler {
 		api.Post("/reviews/{cardID}", s.reviewCard)
 		api.Get("/reminder", s.getReminder)
 		api.Put("/reminder", s.updateReminder)
+		api.Get("/vocabulary/search", s.searchVocabulary)
+		api.Post("/vocabulary/custom", s.addCustomWord)
+		api.Get("/discussions/next", s.nextDiscussion)
+		api.Post("/discussions/{questionID}/log", s.logDiscussion)
+		api.Post("/assistant/token", s.createAssistantToken)
+		api.Post("/assistant/sessions", s.reportAssistantSession)
+		api.Put("/assistant/level", s.setAssistantLevel)
 	})
 	return router
 }
+
+// isNoRows reports whether a query came back empty, which several handlers treat
+// as a default rather than an error.
+func isNoRows(err error) bool { return errors.Is(err, pgx.ErrNoRows) }
 
 func (s *Server) authenticate(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
