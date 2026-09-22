@@ -12,6 +12,7 @@ import (
 
 	"github.com/xbakhrom/lison-backend/internal/config"
 	"github.com/xbakhrom/lison-backend/internal/database"
+	"github.com/xbakhrom/lison-backend/internal/grammar"
 	"github.com/xbakhrom/lison-backend/internal/httpapi"
 	"github.com/xbakhrom/lison-backend/internal/reminder"
 	"github.com/xbakhrom/lison-backend/internal/telegram"
@@ -33,6 +34,12 @@ func main() {
 		logger.Error("migrate database", "error", err)
 		os.Exit(1)
 	}
+	published, err := grammar.Sync(ctx, db)
+	if err != nil {
+		logger.Error("sync grammar content", "error", err)
+		os.Exit(1)
+	}
+	logger.Info("grammar content synced", "topics", published)
 
 	telegramClient := telegram.NewClient(cfg.TelegramBotToken, cfg.MiniAppURL)
 	api := httpapi.New(cfg, db, telegramClient, logger)

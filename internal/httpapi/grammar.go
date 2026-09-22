@@ -15,6 +15,7 @@ type grammarListItem struct {
 	Summary      string `json:"summary"`
 	Level        string `json:"level"`
 	Icon         string `json:"icon"`
+	Stage        string `json:"stage"`
 	Status       string `json:"status"`
 	BestScore    int    `json:"bestScore"`
 	DueDate      string `json:"dueDate,omitempty"`
@@ -38,6 +39,7 @@ type grammarTopicResponse struct {
 	Summary  string                  `json:"summary"`
 	Level    string                  `json:"level"`
 	Icon     string                  `json:"icon"`
+	Stage    string                  `json:"stage"`
 	Lesson   json.RawMessage         `json:"lesson"`
 	Practice json.RawMessage         `json:"practice"`
 	Game     json.RawMessage         `json:"game"`
@@ -59,7 +61,7 @@ func (s *Server) listGrammarTopics(w http.ResponseWriter, r *http.Request) {
 	user := currentUser(r.Context())
 	today := localToday(r)
 	rows, err := s.db.Query(r.Context(), `
-		SELECT t.id, t.slug, t.title, t.summary, t.level, t.icon,
+		SELECT t.id, t.slug, t.title, t.summary, t.level, t.icon, t.stage,
 		       COALESCE(p.status, 'new'), COALESCE(p.best_score, 0),
 		       COALESCE(p.due_date::text, ''),
 		       COALESCE(p.due_date <= $2 AND p.status IN ('learning', 'review'), false),
@@ -79,7 +81,7 @@ func (s *Server) listGrammarTopics(w http.ResponseWriter, r *http.Request) {
 	dueCount := 0
 	for rows.Next() {
 		var topic grammarListItem
-		if err := rows.Scan(&topic.ID, &topic.Slug, &topic.Title, &topic.Summary, &topic.Level, &topic.Icon,
+		if err := rows.Scan(&topic.ID, &topic.Slug, &topic.Title, &topic.Summary, &topic.Level, &topic.Icon, &topic.Stage,
 			&topic.Status, &topic.BestScore, &topic.DueDate, &topic.Due, &topic.LessonBlocks, &topic.MasteryLevel); err != nil {
 			writeError(w, http.StatusInternalServerError, "database_error", "Не удалось загрузить грамматику.")
 			return
@@ -101,7 +103,7 @@ func (s *Server) getGrammarTopic(w http.ResponseWriter, r *http.Request) {
 	user := currentUser(r.Context())
 	var topic grammarTopicResponse
 	err := s.db.QueryRow(r.Context(), `
-		SELECT t.id, t.slug, t.title, t.summary, t.level, t.icon,
+		SELECT t.id, t.slug, t.title, t.summary, t.level, t.icon, t.stage,
 		       t.lesson, t.practice, t.game,
 		       COALESCE(p.status, 'new'), COALESCE(p.best_score, 0),
 		       COALESCE(p.due_date::text, ''), COALESCE(p.repetitions, 0),
@@ -109,7 +111,7 @@ func (s *Server) getGrammarTopic(w http.ResponseWriter, r *http.Request) {
 		FROM grammar_topics t
 		LEFT JOIN user_grammar_progress p ON p.topic_id = t.id AND p.user_id = $2
 		WHERE t.slug = $1 AND t.status = 'published'`, chi.URLParam(r, "slug"), user.ID,
-	).Scan(&topic.ID, &topic.Slug, &topic.Title, &topic.Summary, &topic.Level, &topic.Icon,
+	).Scan(&topic.ID, &topic.Slug, &topic.Title, &topic.Summary, &topic.Level, &topic.Icon, &topic.Stage,
 		&topic.Lesson, &topic.Practice, &topic.Game,
 		&topic.Progress.Status, &topic.Progress.BestScore, &topic.Progress.DueDate, &topic.Progress.Repetitions,
 		&topic.Progress.MasteryLevel)

@@ -8,6 +8,8 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
+
+	"github.com/xbakhrom/lison-backend/internal/grammar"
 )
 
 var (
@@ -23,6 +25,7 @@ func main() {
 
 	files := 0
 	errorsFound := 0
+	errorsFound += lintGrammar()
 	err := filepath.WalkDir(*root, func(path string, entry os.DirEntry, walkErr error) error {
 		if walkErr != nil {
 			return walkErr
@@ -53,6 +56,32 @@ func main() {
 	if errorsFound > 0 {
 		os.Exit(1)
 	}
+}
+
+// lintGrammar checks the embedded grammar bank and reports how many problems it
+// found so the command exits non-zero on broken content.
+func lintGrammar() int {
+	topics, err := grammar.LoadTopics()
+	if err != nil {
+		fmt.Printf("ERROR contents/grammar: %v\n", err)
+		return 1
+	}
+	issues := grammar.Validate(topics)
+	for _, issue := range issues {
+		fmt.Printf("ERROR contents/grammar: %s\n", issue)
+	}
+	if len(issues) == 0 {
+		fmt.Printf("OK contents/grammar (%d topics, %d questions)\n", len(topics), grammarQuestionCount(topics))
+	}
+	return len(issues)
+}
+
+func grammarQuestionCount(topics []grammar.Topic) int {
+	total := 0
+	for _, topic := range topics {
+		total += len(topic.Practice) + len(topic.Game)
+	}
+	return total
 }
 
 func validate(path string) ([]string, int) {
