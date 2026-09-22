@@ -22,7 +22,9 @@ Optional variables:
 ## One-time server setup
 
 1. Install Docker Engine and the Compose plugin.
-2. Create `/opt/lison` and copy `compose.production.yaml` there as `/opt/lison/compose.production.yaml`.
+2. Create `/opt/lison`, copy `compose.production.yaml` there as
+   `/opt/lison/compose.production.yaml`, and copy the `nginx` directory there
+   as `/opt/lison/nginx`.
 3. Copy `production.env.example` to `/opt/lison/.env`, fill the values and run `chmod 600 /opt/lison/.env`.
    Use a URL-safe PostgreSQL password because it is inserted into `DATABASE_URL` by Compose.
 4. Give the deployment user access to Docker and `/opt/lison`.
@@ -36,4 +38,51 @@ Optional variables:
 
 After this, pushes to `main` deploy each container independently. The deployment performs a local health-check and restores the previous image if it fails.
 
-Nginx can later proxy `/` to `http://127.0.0.1:3000` and `/api/` plus `/health` to `http://127.0.0.1:8080`.
+## Nginx and HTTPS
+
+The checked-in Nginx configuration serves `lison.xbakhrom.uz`, sends `/api/`
+and `/health` to the backend on `127.0.0.1:8080`, and sends every other
+request to the webapp on `127.0.0.1:3010`.
+
+Before starting, point the domain's DNS record to the server and allow inbound
+TCP ports 80 and 443. On Ubuntu/Debian, install Nginx and Certbot:
+
+```bash
+sudo apt update
+sudo apt install -y nginx certbot
+sudo install -d -m 755 /var/www/certbot
+```
+
+Install the HTTP-only bootstrap configuration first:
+
+```bash
+cd /opt/lison
+sudo install -m 644 nginx/lison.bootstrap.conf /etc/nginx/sites-available/lison
+sudo ln -sfn /etc/nginx/sites-available/lison /etc/nginx/sites-enabled/lison
+sudo nginx -t
+sudo systemctl reload nginx
+```
+
+Request the first certificate, then replace the bootstrap configuration with
+the production HTTPS configuration:
+
+```bash
+sudo certbot certonly --webroot -w /var/www/certbot \
+  --deploy-hook "systemctl reload nginx" \
+  -d lison.xbakhrom.uz
+sudo install -m 644 nginx/lison.conf /etc/nginx/sites-available/lison
+sudo nginx -t
+sudo systemctl reload nginx
+```
+
+Verify the public routes and automatic renewal:
+
+```bash
+curl -I http://lison.xbakhrom.uz
+curl https://lison.xbakhrom.uz/health
+sudo certbot renew --dry-run
+```
+
+The HTTP request should redirect to HTTPS, and the health endpoint should
+return `{"status":"ok"}`. Certbot's systemd timer will renew the certificate;
+its webroot challenge continues to work through the production configuration.

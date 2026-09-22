@@ -13,6 +13,7 @@ type Config struct {
 	FrontendOrigin        string
 	TelegramBotToken      string
 	TelegramWebhookSecret string
+	FeedbackChatID        int64
 	MiniAppURL            string
 	DevUserID             int64
 	TelegramAuthMaxAge    time.Duration
@@ -26,6 +27,7 @@ func Load() Config {
 		FrontendOrigin:        env("FRONTEND_ORIGIN", "http://localhost:5173"),
 		TelegramBotToken:      os.Getenv("TELEGRAM_BOT_TOKEN"),
 		TelegramWebhookSecret: os.Getenv("TELEGRAM_WEBHOOK_SECRET"),
+		FeedbackChatID:        envInt64("FEEDBACK_CHAT_ID", 0),
 		MiniAppURL:            env("MINI_APP_URL", "http://localhost:5173"),
 		DevUserID:             envInt64("DEV_USER_ID", 1001),
 		TelegramAuthMaxAge:    24 * time.Hour,

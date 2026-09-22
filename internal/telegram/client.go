@@ -15,6 +15,16 @@ type Client struct {
 	httpClient *http.Client
 }
 
+type Feedback struct {
+	UserID    int64
+	FirstName string
+	Username  string
+	Category  string
+	Message   string
+	Screen    string
+	TopicSlug string
+}
+
 func NewClient(token, miniAppURL string) *Client {
 	return &Client{
 		token:      token,
@@ -77,6 +87,28 @@ func russianTopicNoun(count int) string {
 		return "темы"
 	}
 	return "тем"
+}
+
+func (c *Client) SendFeedback(ctx context.Context, chatID int64, feedback Feedback) error {
+	username := "—"
+	if feedback.Username != "" {
+		username = "@" + feedback.Username
+	}
+	contextLine := feedback.Screen
+	if feedback.TopicSlug != "" {
+		contextLine += " / " + feedback.TopicSlug
+	}
+	if contextLine == "" {
+		contextLine = "—"
+	}
+
+	return c.sendMessage(ctx, map[string]any{
+		"chat_id": chatID,
+		"text": fmt.Sprintf(
+			"💬 Новый отзыв Lison\n\nКатегория: %s\nЭкран: %s\nПользователь: %s (%s, %d)\n\n%s",
+			feedback.Category, contextLine, feedback.FirstName, username, feedback.UserID, feedback.Message,
+		),
+	})
 }
 
 func russianCardNoun(count int) string {

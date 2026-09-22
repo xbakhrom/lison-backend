@@ -34,7 +34,7 @@ previous_image="$(docker inspect --format '{{.Config.Image}}' "$container" 2>/de
 cd "$deploy_path"
 export "${image_variable}=${image}"
 docker compose -f "$compose_file" pull "$service"
-docker compose -f "$compose_file" up -d --no-deps "$service"
+docker compose -f "$compose_file" up -d "$service"
 
 healthy=false
 for _ in {1..15}; do
@@ -49,7 +49,7 @@ if [[ "$healthy" != true ]]; then
   echo "Health-check failed for ${service}. Rolling back." >&2
   if [[ -n "$previous_image" ]]; then
     export "${image_variable}=${previous_image}"
-    docker compose -f "$compose_file" up -d --no-deps "$service"
+    docker compose -f "$compose_file" up -d "$service"
   fi
   exit 1
 fi

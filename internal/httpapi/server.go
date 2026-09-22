@@ -46,6 +46,7 @@ func (s *Server) Routes() http.Handler {
 
 	router.Route("/api/v1", func(api chi.Router) {
 		api.Use(s.authenticate)
+		api.Post("/feedback", s.submitFeedback)
 		api.Get("/topics", s.listTopics)
 		api.Get("/topics/{slug}", s.getTopic)
 		api.Put("/topics/{topicID}/answers/{fieldID}", s.saveAnswer)
