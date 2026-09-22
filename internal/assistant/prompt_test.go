@@ -23,6 +23,41 @@ func TestBuildSystemInstructionCarriesLearnerContext(t *testing.T) {
 	}
 }
 
+// Maks kept slipping into Uzbek, which defeats the immersion the app is for.
+// Russian is the default and Uzbek is strictly on request.
+func TestPromptKeepsMaksInRussian(t *testing.T) {
+	prompt := BuildSystemInstruction(Context{FirstName: "Bekzod", Level: "A2"})
+
+	if !strings.Contains(prompt, "Do NOT speak Uzbek unless the learner explicitly asks") {
+		t.Error("prompt does not forbid unprompted Uzbek")
+	}
+	if !strings.Contains(prompt, "stay in Russian and make the Russian easier") {
+		t.Error("prompt does not say what to do instead of falling back to Uzbek")
+	}
+	// Being spoken to in Uzbek is not the same as being asked for Uzbek, and
+	// that was exactly the gap the learner fell through.
+	if !strings.Contains(prompt, "merely speaking Uzbek to you is not") {
+		t.Error("prompt does not separate a request for Uzbek from being spoken to in Uzbek")
+	}
+}
+
+func TestLessonVocabularyIsMarkedAsReferenceOnly(t *testing.T) {
+	prompt := BuildSystemInstruction(Context{
+		Topic: &TopicContext{
+			ID:    "topic_gorod",
+			Slug:  "gorod",
+			Title: "Город",
+			Words: []Word{{Russian: "Столица", Uzbek: "poytaxt"}},
+		},
+	})
+
+	// He needs the Uzbek meanings to teach, but handing him a bilingual list is
+	// an invitation to read it out.
+	if !strings.Contains(prompt, "for your own reference only") {
+		t.Error("the Uzbek column is not marked as reference only")
+	}
+}
+
 func TestBuildSystemInstructionWithoutLevel(t *testing.T) {
 	prompt := BuildSystemInstruction(Context{FirstName: "Bekzod"})
 	if !strings.Contains(prompt, "Level unknown") {

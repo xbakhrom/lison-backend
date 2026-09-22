@@ -83,8 +83,10 @@ func (s *Server) createAssistantToken(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// No language is pinned on purpose: Maks explains in Uzbek and drills in
-	// Russian, so forcing one output language would fight the persona.
+	// No language is pinned even though Maks speaks Russian: he still has to be
+	// able to answer in Uzbek on the rare occasions the learner asks for it, and
+	// a pinned languageCode would mangle those few sentences. The persona is
+	// what keeps him in Russian.
 	token, err := s.gemini.CreateToken(r.Context(), gemini.SessionConstraints{
 		SystemInstruction: assistant.BuildSystemInstruction(sessionContext),
 		VoiceName:         "Puck",
