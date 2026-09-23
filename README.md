@@ -19,7 +19,7 @@ backend only mints a short-lived token for it, so nginx and Go timeouts stay out
 of the audio path.
 
 Set `GEMINI_API_KEY` to switch it on. `GEMINI_LIVE_MODEL` (default
-`gemini-3.8-live`) and `ASSISTANT_DAILY_MINUTES` (default 15) tune the model and
+`gemini-3.8-live`) and `ASSISTANT_DAILY_MINUTES` (default 120) tune the model and
 the per-learner daily quota. Without an API key the assistant reports itself as
 unavailable and nothing else changes.
 

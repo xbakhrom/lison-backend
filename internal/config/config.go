@@ -36,7 +36,7 @@ func Load() Config {
 		TelegramAuthMaxAge:    24 * time.Hour,
 		GeminiAPIKey:          os.Getenv("GEMINI_API_KEY"),
 		GeminiLiveModel:       env("GEMINI_LIVE_MODEL", "gemini-3.8-live"),
-		AssistantDailyMinutes: envInt("ASSISTANT_DAILY_MINUTES", 15),
+		AssistantDailyMinutes: envInt("ASSISTANT_DAILY_MINUTES", 120),
 	}
 }
 

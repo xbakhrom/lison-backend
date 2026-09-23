@@ -58,6 +58,32 @@ func TestLessonVocabularyIsMarkedAsReferenceOnly(t *testing.T) {
 	}
 }
 
+// The Uzbek side of a card is display data. Without this rule Maks quizzes by
+// reading it out, which both breaks immersion and makes the review trivial.
+func TestPromptQuizzesInRussianNotUzbek(t *testing.T) {
+	prompt := BuildSystemInstruction(Context{})
+	if !strings.Contains(prompt, "Never read the Uzbek side aloud") {
+		t.Error("prompt does not forbid quizzing by reading the Uzbek side")
+	}
+	if !strings.Contains(prompt, "describe the word in simple Russian") {
+		t.Error("prompt does not say how to prompt a card instead")
+	}
+}
+
+func TestKnownLevelGetsConcreteGuidance(t *testing.T) {
+	a1 := BuildSystemInstruction(Context{Level: "A1"})
+	if !strings.Contains(a1, "lots of repetition") {
+		t.Error("A1 prompt is missing beginner guidance")
+	}
+	b2 := BuildSystemInstruction(Context{Level: "B2"})
+	if !strings.Contains(b2, "idioms included") {
+		t.Error("B2 prompt is missing advanced guidance")
+	}
+	if strings.Contains(a1, "idioms included") {
+		t.Error("A1 prompt carries B2 guidance")
+	}
+}
+
 func TestBuildSystemInstructionWithoutLevel(t *testing.T) {
 	prompt := BuildSystemInstruction(Context{FirstName: "Bekzod"})
 	if !strings.Contains(prompt, "Level unknown") {
